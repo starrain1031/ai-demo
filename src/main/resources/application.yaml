@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: ai-demo
+  ai:
+    model:
+      chat: openai
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: gemma4:e4b
+    openai:
+      base-url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        model: deepseek-v4-flash
+#        extra-body:
+#          enable_thinking: true
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
+    org.starry.aidemo: debug
