@@ -15,6 +15,9 @@ spring:
         model: deepseek-v4-flash
 #        extra-body:
 #          enable_thinking: true
+      embedding:
+        model: text-embedding-v4
+        dimensions: 1024
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/web_school?serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowPublicKeyRetrieval=true&allowMultiQueries=true&useServerPrepStmts=false
