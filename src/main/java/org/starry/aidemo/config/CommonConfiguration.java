@@ -9,6 +9,8 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,6 +81,26 @@ public class CommonConfiguration {
 //                )
                 .metadataFields(
                         RedisVectorStore.MetadataField.tag("file_key")
+                )
+                .build();
+    }
+
+    @Bean
+    public ChatClient pdfChatClient(ChatModel model, ChatMemory chatMemory, RedisVectorStore vectorStore) {
+        return ChatClient
+                .builder(model)
+//                .defaultSystem(SystemConstants.PDF_SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        new SimpleLoggerAdvisor(),
+                        RetrievalAugmentationAdvisor.builder()
+                                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                                        .vectorStore(vectorStore)
+                                        .similarityThreshold(0.6)
+                                        .topK(2)
+                                        .build())
+                                .build()
+
                 )
                 .build();
     }

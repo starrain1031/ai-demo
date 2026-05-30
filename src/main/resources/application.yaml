@@ -1,6 +1,10 @@
 spring:
   application:
     name: ai-demo
+  servlet:
+    multipart:
+      max-file-size: 104857600
+      max-request-size: 104857600
 
   ai:
     vectorstore:
@@ -21,8 +25,8 @@ spring:
       api-key: ${DASHSCOPE_API_KEY}
       chat:
         model: deepseek-v4-flash
-#        extra-body:
-#          enable_thinking: true
+      #        extra-body:
+      #          enable_thinking: true
       embedding:
         model: text-embedding-v4
         dimensions: 1024
