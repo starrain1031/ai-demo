@@ -1,6 +1,7 @@
 package org.starry.aidemo.config;
 
 
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -32,6 +33,8 @@ public class CommonConfiguration {
     public ChatClient chatClient(ChatModel model, ChatMemory chatMemory) {
         return ChatClient
                 .builder(model)
+                //OpenAiChatOptions is necessary
+                .defaultOptions(OpenAiChatOptions.builder().model("qwen3.5-omni-flash"))
 //                .defaultSystem("")
                 .defaultAdvisors(
                     new SimpleLoggerAdvisor(),
