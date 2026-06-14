@@ -14,10 +14,17 @@ import org.starry.aidemo.service.ICourseService;
 import org.starry.aidemo.service.ISchoolService;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
 public class CourseTools {
+
+    private static final Map<String, String> ALLOWED_SORT_FIELDS = Map.of(
+            "price", "price",
+            "duration", "duration"
+    );
 
     private final ICourseService courseService;
     private final ISchoolService schoolService;
@@ -34,11 +41,22 @@ public class CourseTools {
                 .le(query.getEdu() != null, "edu", query.getEdu());//edu<=2
         if (query.getSorts() != null && !query.getSorts().isEmpty()){
             for (CourseQuery.Sort sort: query.getSorts()) {
-                wrapper.orderBy(true, sort.getAsc(), sort.getField());
+                String sortField = getAllowedSortField(sort);
+                if (sortField != null) {
+                    wrapper.orderBy(true, !Boolean.FALSE.equals(sort.getAsc()), sortField);
+                }
             }
         }
         return wrapper.list();
     }
+
+    private String getAllowedSortField(CourseQuery.Sort sort) {
+        if (sort == null || sort.getField() == null) {
+            return null;
+        }
+        return ALLOWED_SORT_FIELDS.get(sort.getField().trim().toLowerCase(Locale.ROOT));
+    }
+
     @Tool(description="query all schools")
     public List<School> queryAllSchools() {
         return schoolService.list();

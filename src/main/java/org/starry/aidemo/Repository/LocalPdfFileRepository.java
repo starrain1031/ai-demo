@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -34,26 +38,35 @@ public class LocalPdfFileRepository implements FileRepository{
     //id - file,id - file_key
     private final Properties chatFiles = new Properties();
 
+    @Value("${app.pdf.upload-dir:./data/pdf}")
+    private String uploadDir;
+
     @Override
     public boolean save(String chatId, Resource resource) {
         String filename = resource.getFilename();
-        File target = new File(Objects.requireNonNull(filename));
-        if (!target.exists()) {
-            try {
-                Files.copy(resource.getInputStream(), target.toPath());
-            } catch (IOException e) {
-                log.error("Failed to save PDF resource.", e);
-                return false;
-            }
+        String fileKey = fileKey(chatId, Objects.requireNonNull(filename));
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path target = uploadPath.resolve(fileKey + ".pdf").normalize();
+
+        if (!target.startsWith(uploadPath)) {
+            log.error("Invalid PDF target path: {}", target);
+            return false;
         }
 
-        String fileKey = fileKey(chatId, filename);
+        try {
+            Files.createDirectories(uploadPath);
+            Files.copy(resource.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            log.error("Failed to save PDF resource.", e);
+            return false;
+        }
+
         // Save mapping in properties
-        chatFiles.put(chatId, filename);
+        chatFiles.put(chatId, target.toString());
         chatFiles.put(chatId + FILE_KEY_SUFFIX, fileKey);
 
         // attach fileKey to the document
-        List<Document> documents = readPdf(target);
+        List<Document> documents = readPdf(target.toFile());
         documents.forEach(doc -> doc.getMetadata().put("file_key", fileKey));
 
         //add to vector store
@@ -64,7 +77,11 @@ public class LocalPdfFileRepository implements FileRepository{
 
     @Override
     public Resource getFile(String chatId) {
-        return new FileSystemResource(chatFiles.getProperty(chatId));
+        String filePath = chatFiles.getProperty(chatId);
+        if (filePath == null) {
+            return new FileSystemResource("__missing_pdf__");
+        }
+        return new FileSystemResource(filePath);
     }
 
     @Override

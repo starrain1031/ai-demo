@@ -46,3 +46,7 @@ logging:
   level:
     org.springframework.ai: debug
     org.starry.aidemo: debug
+
+app:
+  pdf:
+    upload-dir: ./data/pdf
