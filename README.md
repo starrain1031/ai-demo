@@ -242,4 +242,4 @@ Supported `type` values include:
 
 ## License
 
-MIT License Copyright (c) 2026 Starry.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
