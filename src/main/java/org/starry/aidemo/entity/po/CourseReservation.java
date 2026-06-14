@@ -10,12 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * <p>
- * 
- * </p>
- *
- * @author author
- * @since 2026-05-26
+ * Course reservation entity mapped to the course_reservation table.
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -25,35 +20,38 @@ public class CourseReservation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Primary key.
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * Reserved course
+     * Reserved course.
      */
     @TableField("course")
     private String course;
 
     /**
-     * Student name
+     * Student name.
      */
     @TableField("student_name")
     private String studentName;
 
     /**
-     * Contact information
+     * Contact information.
      */
     @TableField("contact_info")
     private String contactInfo;
 
     /**
-     * Reserved campus
+     * Reserved campus.
      */
     @TableField("school")
     private String school;
 
     /**
-     * Remark
+     * Additional reservation remark.
      */
     @TableField("remark")
     private String remark;

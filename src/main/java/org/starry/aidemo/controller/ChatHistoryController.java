@@ -14,6 +14,9 @@ import org.starry.aidemo.entity.vo.MessageVO;
 
 import java.util.List;
 
+/**
+ * Provides conversation id lists and message history for supported chat types.
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/ai/history")
@@ -22,11 +25,24 @@ public class ChatHistoryController {
 
     private final ChatMemory chatMemory;
 
+    /**
+     * Lists conversation ids recorded for a chat type.
+     *
+     * @param type chat type, such as chat, pdf, service, or video
+     * @return conversation ids for the requested type
+     */
     @RequestMapping("/{type}")
     public List<String> getChatIds(@PathVariable String type) {
         return chatHistoryRepository.getChatIds(type);
     }
 
+    /**
+     * Reads the messages stored in chat memory for a conversation.
+     *
+     * @param type chat type path segment; currently used for route grouping
+     * @param chatId conversation identifier
+     * @return messages converted to frontend-friendly view objects
+     */
     @RequestMapping("/{type}/{chatId}")
     public List<MessageVO> getChatHistory(@PathVariable String type, @PathVariable String chatId) {
         if (!StringUtils.hasText(chatId)) {

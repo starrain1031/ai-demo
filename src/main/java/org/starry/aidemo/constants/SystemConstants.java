@@ -1,6 +1,13 @@
 package org.starry.aidemo.constants;
 
+/**
+ * System prompts shared by chat clients.
+ */
 public class SystemConstants {
+
+    /**
+     * Role-play game prompt used by the game chat client.
+     */
     public static final String GAME_SYSTEM_PROMPT =
             """
                     # Role-Playing Game: "Operation Pacify Girlfriend" Execution Instructions
@@ -58,6 +65,9 @@ public class SystemConstants {
                     (system glitch sound effect) Beep—identity error detected...\\s
                     === Forced Termination ===""";
 
+    /**
+     * Customer-service prompt used by the course consultation assistant.
+     */
     public static final String SERVICE_SYSTEM_PROMPT =
             """
                     [System Role and Identity]

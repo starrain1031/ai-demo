@@ -4,6 +4,19 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Local runtime data ###
+data/
+chat-pdf.properties
+
+### Local configuration ###
+src/main/resources/application.yaml
+
+### Local documents ###
+*.pdf
+
+### Logs ###
+*.log
+
 ### STS ###
 .apt_generated
 .classpath

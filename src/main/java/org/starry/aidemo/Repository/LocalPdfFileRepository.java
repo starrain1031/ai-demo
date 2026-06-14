@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
+/**
+ * Local PDF repository that persists uploaded files and indexes their pages in a vector store.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -41,6 +44,13 @@ public class LocalPdfFileRepository implements FileRepository{
     @Value("${app.pdf.upload-dir:./data/pdf}")
     private String uploadDir;
 
+    /**
+     * Saves a PDF, records its mapping, and refreshes its vector-store documents.
+     *
+     * @param chatId conversation identifier that owns the PDF
+     * @param resource uploaded PDF resource
+     * @return true if the file and vectors were saved successfully
+     */
     @Override
     public boolean save(String chatId, Resource resource) {
         String filename = resource.getFilename();
@@ -75,6 +85,12 @@ public class LocalPdfFileRepository implements FileRepository{
         return true;
     }
 
+    /**
+     * Resolves the local PDF file associated with the conversation.
+     *
+     * @param chatId conversation identifier
+     * @return local PDF resource, or a missing resource placeholder
+     */
     @Override
     public Resource getFile(String chatId) {
         String filePath = chatFiles.getProperty(chatId);
@@ -84,11 +100,17 @@ public class LocalPdfFileRepository implements FileRepository{
         return new FileSystemResource(filePath);
     }
 
+    /**
+     * Returns the metadata key used to filter this conversation's PDF chunks.
+     */
     @Override
     public String getFileKey(String chatId) {
         return chatFiles.getProperty(chatId + FILE_KEY_SUFFIX);
     }
 
+    /**
+     * Reads a PDF into one document per page for vector indexing.
+     */
     private List<Document> readPdf(File file) {
         PagePdfDocumentReader reader = new PagePdfDocumentReader(
                 new FileSystemResource(file),
@@ -100,6 +122,9 @@ public class LocalPdfFileRepository implements FileRepository{
         return reader.read();
     }
 
+    /**
+     * Creates a stable, safe key from the conversation id and original filename.
+     */
     private String fileKey(String chatId, String filename) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -110,6 +135,9 @@ public class LocalPdfFileRepository implements FileRepository{
         }
     }
 
+    /**
+     * Loads persisted chat-to-file mappings when the application starts.
+     */
     @PostConstruct
     private void init() {
         FileSystemResource pdfResource = new FileSystemResource("chat-pdf.properties");
@@ -123,6 +151,9 @@ public class LocalPdfFileRepository implements FileRepository{
 
     }
 
+    /**
+     * Persists chat-to-file mappings before the application shuts down.
+     */
     @PreDestroy
     private void persistent() {
         try {

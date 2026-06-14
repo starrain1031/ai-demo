@@ -10,12 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * <p>
- * Course table
- * </p>
- *
- * @author author
- * @since 2026-05-26
+ * Course entity mapped to the course table.
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -32,31 +27,31 @@ public class Course implements Serializable {
     private Integer id;
 
     /**
-     * Course name
+     * Course name.
      */
     @TableField("name")
     private String name;
 
     /**
-     * Education requirement: 0-None, 1-Junior High School, 2-Senior High School, 3-College, 4-Bachelor Degree or above
+     * Education requirement: 0-None, 1-Junior High School, 2-Senior High School, 3-College, 4-Bachelor Degree or above.
      */
     @TableField("edu")
     private Integer edu;
 
     /**
-     * Course type: Programming, Design, New Media, Other
+     * Course type: Programming, Design, New Media, or Other.
      */
     @TableField("type")
     private String type;
 
     /**
-     * Course price
+     * Course price.
      */
     @TableField("price")
     private Long price;
 
     /**
-     * Study duration, unit: days
+     * Study duration in days.
      */
     @TableField("duration")
     private Integer duration;

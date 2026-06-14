@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.starry.aidemo.Repository.ChatHistoryRepository;
@@ -23,6 +27,9 @@ import java.util.Objects;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
+/**
+ * Handles PDF upload, download, indexing, and PDF-grounded chat.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -30,15 +37,21 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 public class PdfController {
 
     private final FileRepository fileRepository;
-
     private final ChatClient pdfChatClient;
     private final ChatHistoryRepository chatHistoryRepository;
 
+    /**
+     * Streams an answer grounded in the PDF uploaded for the conversation.
+     *
+     * @param prompt user question about the uploaded PDF
+     * @param chatId conversation identifier bound to a PDF file
+     * @return streamed answer text from the PDF chat client
+     */
     @RequestMapping(value = "/chat", produces = "text/plain;charset=utf-8")
     public Flux<String> chat(String prompt, String chatId) {
         if (!StringUtils.hasText(prompt)) {
-            throw new ResponseStatusException
-                    (HttpStatus.BAD_REQUEST, "Sorry, the prompt can not be null");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Sorry, the prompt can not be null");
         }
 
         chatHistoryRepository.save("pdf", chatId);
@@ -61,6 +74,13 @@ public class PdfController {
                 .content();
     }
 
+    /**
+     * Uploads and indexes a PDF for a conversation.
+     *
+     * @param chatId conversation identifier that owns the PDF
+     * @param file uploaded PDF file
+     * @return operation result for the frontend
+     */
     @RequestMapping("/upload/{chatId}")
     public Result uploadPdf(@PathVariable String chatId, @RequestParam("file") MultipartFile file) {
         try {
@@ -68,19 +88,24 @@ public class PdfController {
                 return Result.fail("Only PDF can be uploaded");
             }
             boolean success = fileRepository.save(chatId, file.getResource());
-            if(! success) {
+            if (!success) {
                 return Result.fail("Failed to save the file");
             }
             return Result.ok();
         } catch (Exception e) {
             log.error("Failed to upload PDF.", e);
-            return Result.fail("Failed to upload！");
+            return Result.fail("Failed to upload");
         }
     }
 
+    /**
+     * Downloads the PDF associated with a conversation.
+     *
+     * @param chatId conversation identifier
+     * @return PDF resource if it exists
+     */
     @GetMapping("/file/{chatId}")
     public ResponseEntity<Resource> download(@PathVariable("chatId") String chatId) {
-
         Resource resource = fileRepository.getFile(chatId);
         if (!resource.exists()) {
             return ResponseEntity.notFound().build();

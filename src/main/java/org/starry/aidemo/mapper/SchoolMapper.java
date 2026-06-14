@@ -1,15 +1,10 @@
 package org.starry.aidemo.mapper;
 
-import org.starry.aidemo.entity.po.School;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.starry.aidemo.entity.po.School;
 
 /**
- * <p>
- * Campus table Mapper 接口
- * </p>
- *
- * @author author
- * @since 2026-05-26
+ * MyBatis-Plus mapper for school campus records.
  */
 public interface SchoolMapper extends BaseMapper<School> {
 

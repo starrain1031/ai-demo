@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Handles video-understanding chat requests through an OpenAI-compatible API.
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/ai/video")
@@ -52,6 +55,14 @@ public class VideoController {
     @Value("${app.ai.video.model:qwen3.5-omni-flash}")
     private String videoModel;
 
+    /**
+     * Streams a response for a video and prompt pair.
+     *
+     * @param prompt user prompt for the uploaded video
+     * @param chatId conversation identifier recorded in history
+     * @param file uploaded video file
+     * @return streamed response text from the multimodal model
+     */
     @PostMapping(value = "/chat", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = "text/plain;charset=utf-8")
     public Flux<String> chat(@RequestParam("prompt") String prompt,
@@ -82,6 +93,9 @@ public class VideoController {
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
+    /**
+     * Builds and sends the OpenAI-compatible video chat completion request.
+     */
     private HttpResponse<Stream<String>> sendVideoRequest(String prompt, MultipartFile file)
             throws IOException, InterruptedException {
 
@@ -138,6 +152,9 @@ public class VideoController {
         return response;
     }
 
+    /**
+     * Converts server-sent-event style response lines into streamed text chunks.
+     */
     private Flux<String> readStreamContent(HttpResponse<Stream<String>> response) {
         return Flux.fromStream(response.body())
                 .filter(StringUtils::hasText)
@@ -150,6 +167,9 @@ public class VideoController {
                 .filter(StringUtils::hasText);
     }
 
+    /**
+     * Extracts the delta content field from one streaming JSON payload.
+     */
     private String extractDeltaContent(String data) {
         try {
             JsonNode root = objectMapper.readTree(data);

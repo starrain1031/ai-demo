@@ -19,9 +19,17 @@ import org.starry.aidemo.Tools.CourseTools;
 import org.starry.aidemo.constants.SystemConstants;
 import redis.clients.jedis.JedisPooled;
 
+/**
+ * Defines shared Spring AI clients, chat memory, and vector-store infrastructure.
+ */
 @Configuration
 public class CommonConfiguration {
 
+    /**
+     * Creates the in-memory message window used by all chat clients.
+     *
+     * @return chat memory that keeps the latest conversation messages
+     */
     @Bean
     public ChatMemory chatMemory() {
         return MessageWindowChatMemory.builder()
@@ -29,6 +37,14 @@ public class CommonConfiguration {
                 .maxMessages(20)
                 .build();
     }
+
+    /**
+     * Creates the default chat client for general chat and multimodal chat.
+     *
+     * @param model auto-configured chat model
+     * @param chatMemory shared chat memory
+     * @return default chat client
+     */
     @Bean
     public ChatClient chatClient(ChatModel model, ChatMemory chatMemory) {
         return ChatClient
@@ -43,6 +59,13 @@ public class CommonConfiguration {
                 .build();
     }
 
+    /**
+     * Creates the role-play game chat client with a fixed system prompt.
+     *
+     * @param model auto-configured chat model
+     * @param chatMemory shared chat memory
+     * @return game chat client
+     */
     @Bean
     public ChatClient gameChatClient(ChatModel model, ChatMemory chatMemory) {
         return ChatClient
@@ -54,6 +77,15 @@ public class CommonConfiguration {
                 )
                 .build();
     }
+
+    /**
+     * Creates the customer-service chat client with course consultation tools.
+     *
+     * @param model auto-configured chat model
+     * @param chatMemory shared chat memory
+     * @param courseTools Spring AI tools for course search and reservation
+     * @return customer-service chat client
+     */
     @Bean
     public ChatClient serviceChatClient(ChatModel model, ChatMemory chatMemory, CourseTools courseTools) {
         return ChatClient
@@ -66,11 +98,24 @@ public class CommonConfiguration {
                 .defaultTools(courseTools)
                 .build();
     }
+
+    /**
+     * Creates the Redis client used by the vector store.
+     *
+     * @return pooled Redis client
+     */
     @Bean
     public JedisPooled jedisPooled() {
         return new JedisPooled("localhost", 6379);
     }
 
+    /**
+     * Creates the Redis vector store for PDF embeddings.
+     *
+     * @param jedisPooled Redis client
+     * @param embeddingModel embedding model used to vectorize documents
+     * @return Redis-backed vector store
+     */
     @Bean
     public RedisVectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
@@ -88,6 +133,14 @@ public class CommonConfiguration {
                 .build();
     }
 
+    /**
+     * Creates the PDF chat client with retrieval-augmented generation.
+     *
+     * @param model auto-configured chat model
+     * @param chatMemory shared chat memory
+     * @param vectorStore vector store containing indexed PDF pages
+     * @return PDF RAG chat client
+     */
     @Bean
     public ChatClient pdfChatClient(ChatModel model, ChatMemory chatMemory, RedisVectorStore vectorStore) {
         return ChatClient

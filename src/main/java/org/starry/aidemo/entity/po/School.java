@@ -10,12 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * <p>
- * Campus table
- * </p>
- *
- * @author author
- * @since 2026-05-26
+ * School campus entity mapped to the school table.
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -32,13 +27,13 @@ public class School implements Serializable {
     private Integer id;
 
     /**
-     * Campus name
+     * Campus name.
      */
     @TableField("name")
     private String name;
 
     /**
-     * City where the campus is located
+     * City where the campus is located.
      */
     @TableField("city")
     private String city;

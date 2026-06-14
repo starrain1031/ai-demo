@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: ai-demo
+
+  servlet:
+    multipart:
+      max-file-size: 104857600
+      max-request-size: 104857600
+
+  ai:
+    vectorstore:
+      redis:
+        index-name: spring-ai-index
+        initialize-schema: true
+        prefix: "doc"
+
+    model:
+      chat: openai
+      embedding: openai
+
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        model: ${OLLAMA_CHAT_MODEL:gemma4:e4b}
+
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://dashscope-intl.aliyuncs.com/compatible-mode/v1}
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        model: ${OPENAI_CHAT_MODEL:deepseek-v4-flash}
+      embedding:
+        model: ${OPENAI_EMBEDDING_MODEL:text-embedding-v4}
+        dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1024}
+
+  data:
+    redis:
+      client-type: jedis
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/web_school?serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowPublicKeyRetrieval=true&useServerPrepStmts=false}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:change-me}
+
+logging:
+  level:
+    org.springframework.ai: info
+    org.starry.aidemo: debug
+
+app:
+  pdf:
+    upload-dir: ${PDF_UPLOAD_DIR:./data/pdf}
+  ai:
+    video:
+      model: ${VIDEO_CHAT_MODEL:qwen3.5-omni-flash}

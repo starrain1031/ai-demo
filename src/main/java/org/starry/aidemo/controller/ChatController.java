@@ -19,6 +19,9 @@ import java.util.Objects;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
+/**
+ * Handles general chat requests, including optional multimodal file input.
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/ai")
@@ -27,6 +30,14 @@ public class ChatController {
     private final ChatClient chatClient;
     private final ChatHistoryRepository chatHistoryRepository;
 
+    /**
+     * Streams a chat response for the given conversation.
+     *
+     * @param prompt user prompt text
+     * @param chatId conversation identifier used by chat memory
+     * @param files optional files to send as multimodal media
+     * @return streamed response text from the chat model
+     */
     @RequestMapping(value = "/chat", produces = "text/plain;charset=utf-8")
 //    @RequestMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chat(@RequestParam("prompt") String prompt, @RequestParam("chatId") String chatId,
