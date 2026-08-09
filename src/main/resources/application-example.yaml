@@ -21,7 +21,7 @@ spring:
     ollama:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
       chat:
-        model: ${OLLAMA_CHAT_MODEL:gemma4:e4b}
+        model: ${OLLAMA_CHAT_MODEL:gemma4:12b}
 
     openai:
       base-url: ${OPENAI_BASE_URL:https://dashscope-intl.aliyuncs.com/compatible-mode/v1}

@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.starry.aidemo.Tools.CourseTools;
 import org.starry.aidemo.constants.SystemConstants;
-import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.RedisClient;
 
 /**
  * Defines shared Spring AI clients, chat memory, and vector-store infrastructure.
@@ -105,20 +105,22 @@ public class CommonConfiguration {
      * @return pooled Redis client
      */
     @Bean
-    public JedisPooled jedisPooled() {
-        return new JedisPooled("localhost", 6379);
+    public RedisClient redisClient() {
+        return RedisClient.builder()
+                .hostAndPort("localhost", 6379)
+                .build();
     }
 
     /**
      * Creates the Redis vector store for PDF embeddings.
      *
-     * @param jedisPooled Redis client
+     * @param redisClient Redis client
      * @param embeddingModel embedding model used to vectorize documents
      * @return Redis-backed vector store
      */
     @Bean
-    public RedisVectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
-        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+    public RedisVectorStore vectorStore(RedisClient redisClient, EmbeddingModel embeddingModel) {
+        return RedisVectorStore.builder(redisClient, embeddingModel)
                 .indexName("spring-ai-index")
                 .prefix("doc")
                 .initializeSchema(true)
